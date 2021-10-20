@@ -4,3 +4,68 @@ author: "F178306"
 date: "10/20/2021"
 output: pdf_document
 ---
+Installing rhdf5 package to open hdf5 file
+
+```{r}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager",repos = "http://cran.us.r-project.org")
+
+BiocManager::install("rhdf5")
+
+
+```
+Loading file
+
+```{r}
+library("rhdf5")
+h5ls("dataset.hdf5")
+```
+Reading data from file to dataframe
+```{r}
+mydata <- h5read("dataset.hdf5", "/Domain_03/OSBS/min_1/boom_1")
+```
+
+veiwing data 
+
+```{r}
+mydata
+```
+spliting date and time
+
+```{r}
+mydata$temperature$NDate <- as.Date(mydata$temperature$date)
+mydata$temperature$Time <- format(as.POSIXct(mydata$temperature$date), format = "%H:%M:%S") 
+```
+
+veiwing new data
+
+```{r}
+mydata
+```
+Group data on date
+
+```{r}
+suma<-aggregate(mydata$temperature$mean, list(mydata$temperature$NDate), FUN=mean) 
+```
+veiwing group data
+```{r}
+suma
+```
+
+
+installing ggplot
+```{r}
+install.packages("ggplot2",repos = "http://cran.us.r-project.org")
+```
+
+ploting graph
+
+```{r}
+
+library(ggplot2)
+p <- ggplot(suma, aes(x=suma$Group.1, y=suma$x)) +
+  geom_line() + 
+  xlab("")
+p
+```
+
